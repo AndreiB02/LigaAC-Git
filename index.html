@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="ro">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HORT</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bungee+Shade&family=Bungee&family=Comic+Neue:wght@700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --y: #ffee00;
+      --p: #ff2bd6;
+      --c: #00f0ff;
+      --g: #39ff14;
+    }
+    * { box-sizing: border-box; margin: 0; }
+    html, body { overflow-x: hidden; }
+    body {
+      min-height: 100vh;
+      font-family: 'Comic Neue', 'Comic Sans MS', cursive;
+      color: #fff;
+      background: linear-gradient(120deg, #ff0040, #ff9900, #ffee00, #39ff14, #00f0ff, #7a00ff, #ff2bd6, #ff0040);
+      background-size: 400% 400%;
+      animation: bgmove 8s linear infinite;
+      cursor: crosshair;
+    }
+    @keyframes bgmove { to { background-position: 400% 0; } }
+
+    /* rotating sunburst behind everything */
+    .burst {
+      position: fixed; inset: -50%;
+      background: repeating-conic-gradient(rgba(255,255,255,.18) 0 10deg, transparent 10deg 20deg);
+      animation: spin 20s linear infinite;
+      z-index: 0; pointer-events: none;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .marquee {
+      position: relative; z-index: 2;
+      background: #000; color: var(--g);
+      font-family: Bungee, Impact, sans-serif;
+      font-size: 1.3rem; white-space: nowrap; overflow: hidden;
+      padding: 8px 0; border-block: 4px dashed var(--y);
+    }
+    .marquee span { display: inline-block; padding-left: 100%; animation: scroll 12s linear infinite; }
+    .marquee.rev span { animation-direction: reverse; color: var(--p); }
+    @keyframes scroll { to { transform: translateX(-100%); } }
+
+    main {
+      position: relative; z-index: 2;
+      display: flex; flex-direction: column; align-items: center;
+      gap: 24px; padding: 32px 16px 80px;
+    }
+
+    h1 {
+      font-family: 'Bungee Shade', Impact, sans-serif;
+      font-size: clamp(3.5rem, 18vw, 10rem);
+      line-height: 1;
+      display: flex;
+    }
+    h1 span {
+      display: inline-block;
+      animation: bounce 0.9s ease-in-out infinite, hue 3s linear infinite;
+      color: var(--y);
+      text-shadow: 5px 5px 0 #000, -3px -3px 0 var(--p);
+    }
+    h1 span:nth-child(2) { animation-delay: .1s, .3s; }
+    h1 span:nth-child(3) { animation-delay: .2s, .6s; }
+    h1 span:nth-child(4) { animation-delay: .3s, .9s; }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0) rotate(-8deg); }
+      50% { transform: translateY(-30px) rotate(8deg) scale(1.15); }
+    }
+    @keyframes hue { to { filter: hue-rotate(360deg); } }
+
+    .stage { position: relative; display: flex; align-items: center; justify-content: center; gap: 12px; }
+    .side {
+      width: 90px; border-radius: 50%;
+      aspect-ratio: 1; object-fit: cover;
+      border: 4px solid #fff;
+      animation: spin 2s linear infinite;
+    }
+    .side.r { animation-direction: reverse; }
+    @media (max-width: 560px) { .side { display: none; } }
+
+    .frame {
+      position: relative;
+      width: min(360px, 100%);
+      padding: 8px; border-radius: 24px;
+      background: conic-gradient(from 0deg, var(--y), var(--p), var(--c), var(--g), var(--y));
+      animation: tilt 2.4s ease-in-out infinite, hue 4s linear infinite;
+      box-shadow: 0 0 40px var(--p), 0 0 80px var(--c);
+    }
+    .frame img { display: block; width: 100%; height: auto; border-radius: 18px; }
+    @keyframes tilt {
+      0%, 100% { transform: rotate(-4deg) scale(1); }
+      50% { transform: rotate(4deg) scale(1.04); }
+    }
+    .sticker {
+      position: absolute; z-index: 3;
+      font-family: Bungee, Impact, sans-serif;
+      background: var(--y); color: #000;
+      padding: 6px 12px; border: 3px solid #000; border-radius: 8px;
+      font-size: 1rem;
+      animation: pulse .8s ease-in-out infinite;
+    }
+    .sticker.a { top: 30px; left: -30px; transform: rotate(-15deg); }
+    .sticker.b { bottom: 60px; right: -30px; background: var(--g); transform: rotate(12deg); }
+    @keyframes pulse { 50% { scale: 1.2; } }
+
+    .counter {
+      font-family: Bungee, Impact, sans-serif;
+      font-size: 1.4rem; background: #000; padding: 10px 20px;
+      border-radius: 12px; border: 3px solid var(--c);
+      text-align: center;
+    }
+    .counter strong { color: var(--y); font-size: 2.4rem; display: block; }
+    .rank { color: var(--p); font-size: 1rem; }
+
+    .buttons { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; }
+    button {
+      font-family: Bungee, Impact, sans-serif;
+      font-size: 1.3rem; padding: 16px 30px;
+      border: 4px solid #000; border-radius: 999px;
+      background: var(--y); color: #000; cursor: pointer;
+      box-shadow: 0 8px 0 #000;
+      transition: transform .08s, box-shadow .08s;
+    }
+    button:hover { animation: jiggle .3s linear infinite; }
+    button:active { transform: translateY(6px); box-shadow: 0 2px 0 #000; }
+    #chaos { background: var(--p); color: #fff; }
+    @keyframes jiggle {
+      25% { transform: rotate(-4deg); } 75% { transform: rotate(4deg); }
+    }
+
+    .pop {
+      position: fixed; z-index: 50; pointer-events: none;
+      font-family: Bungee, Impact, sans-serif; font-size: 2.2rem;
+      text-shadow: 3px 3px 0 #000;
+      animation: rise 1.2s ease-out forwards;
+    }
+    @keyframes rise { to { transform: translateY(-180px) rotate(var(--r)) scale(1.6); opacity: 0; } }
+
+    .confetti {
+      position: fixed; z-index: 40; pointer-events: none;
+      width: 10px; height: 16px; top: -20px;
+      animation: fall linear forwards;
+    }
+    @keyframes fall { to { transform: translateY(110vh) rotate(720deg); } }
+
+    .flyer {
+      position: fixed; z-index: 30; pointer-events: none;
+      width: 80px; border-radius: 12px; border: 3px solid #fff;
+      box-shadow: 0 0 20px #000;
+    }
+
+    .trail {
+      position: fixed; z-index: 60; pointer-events: none;
+      font-size: 1.4rem; transform: translate(-50%, -50%);
+      animation: fade .7s ease-out forwards;
+    }
+    @keyframes fade { to { opacity: 0; transform: translate(-50%, -50%) scale(2) rotate(90deg); } }
+
+    body.shake { animation: bgmove 8s linear infinite, shake .4s linear; }
+    @keyframes shake {
+      10%, 90% { transform: translate(-4px, 2px); }
+      30%, 70% { transform: translate(6px, -4px); }
+      50% { transform: translate(-6px, 4px); }
+    }
+
+    footer {
+      position: relative; z-index: 2;
+      text-align: center; padding: 16px; background: #000;
+      font-family: Bungee, Impact, sans-serif; color: var(--c);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.001s !important; animation-iteration-count: 1 !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="burst"></div>
+
+  <div class="marquee"><span>🪵 HORT HORT HORT 🪵 ATENȚIE: BĂȚ ÎN MIȘCARE 🪵 HORT HORT HORT 🪵 LIGA AC PREZINTĂ 🪵 HORT HORT HORT 🪵</span></div>
+
+  <main>
+    <h1 aria-label="HORT"><span>H</span><span>O</span><span>R</span><span>T</span></h1>
+
+    <div class="stage">
+      <img class="side" src="hort.gif" alt="">
+      <div class="frame">
+        <span class="sticker a">100% HORT</span>
+        <span class="sticker b">LIVE 🔴</span>
+        <img id="main-gif" src="hort.gif" alt="Hort" width="360" height="640">
+      </div>
+      <img class="side r" src="hort.gif" alt="">
+    </div>
+
+    <div class="counter">
+      HORT-URI
+      <strong id="count">0</strong>
+      <span class="rank" id="rank">începător</span>
+    </div>
+
+    <div class="buttons">
+      <button id="btn">HORT!</button>
+      <button id="chaos">HAOS TOTAL 🌀</button>
+    </div>
+  </main>
+
+  <div class="marquee rev"><span>🔥 NU ATINGEȚI BUTONUL ROZ 🔥 SERIOS 🔥 OK, ATINGEȚI-L 🔥 HORT 🔥 HORT 🔥 HORT 🔥</span></div>
+  <footer>LIGA AC · 2026 · HORT FOREVER</footer>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const btn = $('btn'), chaos = $('chaos'), countEl = $('count'), rankEl = $('rank');
+    const words = ['HORT!', 'HOOORT', 'H O R T', 'BĂȚ!', 'BOOM', '🪵🪵🪵', 'HORT²', 'YEAH'];
+    const colors = ['#ffee00', '#ff2bd6', '#00f0ff', '#39ff14', '#ff9900', '#ffffff'];
+    const ranks = [[0, 'începător'], [10, 'ucenic de hort'], [25, 'hortist'], [50, 'maestru al bățului'], [100, 'LEGENDĂ HORT'], [250, 'ZEUL HORTULUI 👑']];
+    const pick = (a) => a[Math.floor(Math.random() * a.length)];
+    const rand = (min, max) => Math.random() * (max - min) + min;
+
+    let count = 0;
+    try { count = Number(localStorage.getItem('hort-count')) || 0; } catch (e) {}
+    render();
+
+    function render() {
+      countEl.textContent = count;
+      rankEl.textContent = ranks.filter(([n]) => count >= n).pop()[1];
+    }
+
+    function pop(x, y) {
+      const el = document.createElement('span');
+      el.className = 'pop';
+      el.textContent = pick(words);
+      el.style.color = pick(colors);
+      el.style.left = (x - 60 + rand(-60, 60)) + 'px';
+      el.style.top = (y - 20) + 'px';
+      el.style.setProperty('--r', rand(-40, 40) + 'deg');
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 1200);
+    }
+
+    function confetti(n) {
+      for (let i = 0; i < n; i++) {
+        const c = document.createElement('div');
+        c.className = 'confetti';
+        c.style.left = rand(0, 100) + 'vw';
+        c.style.background = pick(colors);
+        c.style.animationDuration = rand(1.5, 3.5) + 's';
+        c.style.animationDelay = rand(0, 0.5) + 's';
+        document.body.appendChild(c);
+        setTimeout(() => c.remove(), 4200);
+      }
+    }
+
+    function shake() {
+      document.body.classList.remove('shake');
+      void document.body.offsetWidth;
+      document.body.classList.add('shake');
+    }
+
+    // a mini hort gif that bounces around the screen
+    function flyer(life = 6000) {
+      const img = document.createElement('img');
+      img.src = 'hort.gif';
+      img.className = 'flyer';
+      document.body.appendChild(img);
+      let x = rand(0, innerWidth - 80), y = rand(0, innerHeight - 140);
+      let vx = rand(3, 7) * (Math.random() < .5 ? -1 : 1), vy = rand(3, 7) * (Math.random() < .5 ? -1 : 1);
+      let rot = 0;
+      const t0 = performance.now();
+      (function step(t) {
+        x += vx; y += vy; rot += vx;
+        if (x < 0 || x > innerWidth - 80) vx *= -1;
+        if (y < 0 || y > innerHeight - 140) vy *= -1;
+        img.style.transform = `translate(${x}px, ${y}px) rotate(${rot}deg)`;
+        if (t - t0 < life) requestAnimationFrame(step); else img.remove();
+      })(t0);
+    }
+
+    btn.addEventListener('click', () => {
+      count++;
+      try { localStorage.setItem('hort-count', count); } catch (e) {}
+      render();
+      const r = btn.getBoundingClientRect();
+      pop(r.left + r.width / 2, r.top);
+      confetti(25);
+      shake();
+      if (count % 10 === 0) { flyer(); confetti(80); }
+    });
+
+    chaos.addEventListener('click', () => {
+      for (let i = 0; i < 8; i++) setTimeout(() => flyer(8000), i * 150);
+      for (let i = 0; i < 12; i++) setTimeout(() => pop(rand(50, innerWidth - 50), rand(100, innerHeight - 50)), i * 80);
+      confetti(150);
+      shake();
+    });
+
+    // clicking the main gif also horts
+    $('main-gif').addEventListener('click', () => btn.click());
+
+    // emoji cursor trail
+    const trailEmoji = ['🪵', '✨', '💥', '🔥', '⭐'];
+    let last = 0;
+    addEventListener('pointermove', (e) => {
+      const now = performance.now();
+      if (now - last < 40) return;
+      last = now;
+      const t = document.createElement('span');
+      t.className = 'trail';
+      t.textContent = pick(trailEmoji);
+      t.style.left = e.clientX + 'px';
+      t.style.top = e.clientY + 'px';
+      document.body.appendChild(t);
+      setTimeout(() => t.remove(), 700);
+    });
+
+    // spacebar = HORT
+    addEventListener('keydown', (e) => {
+      if (e.code === 'Space' && e.target === document.body) { e.preventDefault(); btn.click(); }
+    });
+
+    // tab title goes wild
+    const titles = ['HORT', 'hOrT', 'HoRt', '🪵 HORT 🪵', 'H O R T'];
+    let ti = 0;
+    setInterval(() => { document.title = titles[ti++ % titles.length]; }, 700);
+  </script>
+</body>
+</html>
